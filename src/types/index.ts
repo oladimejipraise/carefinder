@@ -26,6 +26,9 @@ export interface Hospital {
   visiting_hours: string | null
   rating_avg: number | null
   review_count: number
+  lat: number
+  lng: number
+  image_url: string | null
   created_at: string
 }
 
@@ -75,3 +78,8 @@ export type ExportColumn =
   | 'specialties'
   | 'ownership'
   | 'rating_avg'
+
+export const ALL_EXPORT_COLUMNS: ExportColumn[] = [
+  'name', 'address', 'city', 'lga', 'phone',
+  'email', 'specialties', 'ownership', 'rating_avg',
+]

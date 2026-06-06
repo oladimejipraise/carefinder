@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-50:  #f0faf9;
+  --color-brand-100: #ccebe8;
+  --color-brand-200: #99d6d5;
+  --color-brand-500: #3a9e9d;
+  --color-brand-700: #1b6b6a;
+  --color-brand-800: #155554;
+  --color-brand-900: #0c3333;
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  input[type='range'] {
+    accent-color: #1b6b6a;
+  }
+}
