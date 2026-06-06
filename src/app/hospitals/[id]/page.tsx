@@ -11,7 +11,8 @@ import Logo from '@/components/ui/Logo'
 export const revalidate = 60
 
 const window = new JSDOM('').window
-const purify = DOMPurify(window as unknown as Window)
+const purify = DOMPurify(window as unknown as typeof globalThis)
+
 
 const SPECIALTY_COLORS: Record<string, string> = {
   emergency:    'bg-red-50 text-red-700 border-red-100',
