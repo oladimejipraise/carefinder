@@ -2,12 +2,16 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { marked } from 'marked'
-import DOMPurify from 'isomorphic-dompurify'
+import { JSDOM } from 'jsdom'
+import DOMPurify from 'dompurify'
 import { createClient } from '@/lib/supabase/server'
 import ReviewsSection from '@/components/hospital/ReviewsSection'
 import Logo from '@/components/ui/Logo'
 
 export const revalidate = 60
+
+const window = new JSDOM('').window
+const purify = DOMPurify(window as unknown as Window)
 
 const SPECIALTY_COLORS: Record<string, string> = {
   emergency:    'bg-red-50 text-red-700 border-red-100',
@@ -65,7 +69,7 @@ export default async function HospitalDetailPage({ params }: Props) {
     ?? DEFAULT_IMAGE
 
   const descriptionHtml = hospital.description_md
-    ? DOMPurify.sanitize(marked(hospital.description_md) as string)
+    ? purify.sanitize(marked(hospital.description_md) as string)
     : null
 
   return (
@@ -115,7 +119,6 @@ export default async function HospitalDetailPage({ params }: Props) {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t
                                 from-black/30 to-transparent" />
-
                 <div className="absolute top-4 right-4 flex items-center
                                 gap-1.5 bg-white/90 backdrop-blur-sm
                                 rounded-full px-3 py-1">
@@ -124,7 +127,6 @@ export default async function HospitalDetailPage({ params }: Props) {
                     Open now
                   </span>
                 </div>
-
                 <div className={`absolute top-4 left-4 rounded-full px-3
                                  py-1 text-xs font-bold text-white ${
                   hospital.ownership === 'public'
@@ -224,7 +226,6 @@ export default async function HospitalDetailPage({ params }: Props) {
                   )}
                 </div>
 
-                {/* Colored specialty tags */}
                 {hospital.specialties?.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {hospital.specialties.map((s: string) => (
@@ -242,7 +243,7 @@ export default async function HospitalDetailPage({ params }: Props) {
               </div>
             </div>
 
-            {/* About — sanitized HTML from Markdown */}
+            {/* About */}
             {descriptionHtml && (
               <div className="bg-white dark:bg-gray-800 border
                               border-gray-100 dark:border-gray-700
