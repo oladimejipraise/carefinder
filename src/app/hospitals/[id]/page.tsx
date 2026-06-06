@@ -2,16 +2,11 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { marked } from 'marked'
-import { JSDOM } from 'jsdom'
-import DOMPurify from 'dompurify'
 import { createClient } from '@/lib/supabase/server'
 import ReviewsSection from '@/components/hospital/ReviewsSection'
 import Logo from '@/components/ui/Logo'
 
 export const revalidate = 60
-
-const window = new JSDOM('').window
-const purify = DOMPurify(window as unknown as typeof globalThis)
 
 
 const SPECIALTY_COLORS: Record<string, string> = {
@@ -70,7 +65,7 @@ export default async function HospitalDetailPage({ params }: Props) {
     ?? DEFAULT_IMAGE
 
   const descriptionHtml = hospital.description_md
-    ? purify.sanitize(marked(hospital.description_md) as string)
+    ? marked(hospital.description_md) as string
     : null
 
   return (
