@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Share functionality', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/search')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     await page.waitForTimeout(3000)
   })
 

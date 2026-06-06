@@ -3,13 +3,13 @@ import { test, expect } from '@playwright/test'
 test.describe('Hospital detail page', () => {
   async function goToFirstHospital(page: import('@playwright/test').Page) {
     await page.goto('/search')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     await page.waitForTimeout(3000)
     const firstCard = page.locator('a[href^="/hospitals/"]').first()
     await expect(firstCard).toBeVisible({ timeout: 15_000 })
     const href = await firstCard.getAttribute('href')
     await firstCard.click()
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     await page.waitForTimeout(2000)
     return href
   }

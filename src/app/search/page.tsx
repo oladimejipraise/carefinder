@@ -45,7 +45,8 @@ export default function SearchPage() {
   const [searched, setSearched]             = useState(false)
   const [showExport, setShowExport]         = useState(false)
   const [showEmailShare, setShowEmailShare] = useState(false)
-  const [showMap, setShowMap]               = useState(false)
+  const [showMap, setShowMap]               = useState(true)
+  const [showFilters, setShowFilters]       = useState(false)
   const [selectedId, setSelectedId]         = useState<string | null>(null)
   const [currentPage, setCurrentPage]       = useState(1)
   const [toast, setToast] = useState<{
@@ -61,7 +62,7 @@ export default function SearchPage() {
       : [],
   })
 
-  const totalPages       = Math.ceil(hospitals.length / ITEMS_PER_PAGE)
+  const totalPages         = Math.ceil(hospitals.length / ITEMS_PER_PAGE)
   const paginatedHospitals = hospitals.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -100,7 +101,6 @@ export default function SearchPage() {
         if (f.ownership) {
           results = results.filter(h => h.ownership === f.ownership)
         }
-
       } else {
         let q = supabase.from('hospitals').select('*')
 
@@ -153,6 +153,7 @@ export default function SearchPage() {
   }
 
   function handleSearchButton(overrideFilters?: FilterState) {
+    setShowFilters(false)
     runSearch(overrideFilters ?? filters)
   }
 
@@ -184,7 +185,7 @@ export default function SearchPage() {
   }
 
   const ResultsHeader = (
-    <div className="flex items-center justify-between mb-4">
+    <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
       <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
         {loading ? (
           'Searching...'
@@ -203,7 +204,7 @@ export default function SearchPage() {
         )}
       </p>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         {searched && hospitals.length > 0 && !showMap && (
           <select className="text-xs border border-gray-200
                              dark:border-gray-700 dark:bg-gray-800
@@ -260,10 +261,11 @@ export default function SearchPage() {
         {hospitals.length > 0 && (
           <button
             onClick={() => setShowEmailShare(true)}
-            className="flex items-center gap-1.5 border border-gray-200
-                       dark:border-gray-700 text-gray-600 dark:text-gray-400
-                       text-xs font-medium px-3 py-1.5 rounded-lg
-                       hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            className="hidden sm:flex items-center gap-1.5 border
+                       border-gray-200 dark:border-gray-700 text-gray-600
+                       dark:text-gray-400 text-xs font-medium px-3 py-1.5
+                       rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800
+                       transition-colors"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor">
@@ -279,9 +281,9 @@ export default function SearchPage() {
         {hospitals.length > 0 && (
           <button
             onClick={() => setShowExport(true)}
-            className="flex items-center gap-1.5 bg-brand-700 text-white
-                       text-xs font-medium px-3 py-1.5 rounded-lg
-                       hover:bg-brand-800 transition-colors"
+            className="hidden sm:flex items-center gap-1.5 bg-brand-700
+                       text-white text-xs font-medium px-3 py-1.5
+                       rounded-lg hover:bg-brand-800 transition-colors"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor">
@@ -333,8 +335,9 @@ export default function SearchPage() {
   )
 
   const Pagination = (
-    <div className="flex items-center justify-between mt-8 pt-6
-                    border-t border-gray-200 dark:border-gray-700">
+    <div className="flex flex-col sm:flex-row items-center justify-between
+                    mt-8 pt-6 gap-4 border-t border-gray-200
+                    dark:border-gray-700">
       <p className="text-xs text-gray-400">
         Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
         {Math.min(currentPage * ITEMS_PER_PAGE, hospitals.length)}
@@ -342,7 +345,6 @@ export default function SearchPage() {
       </p>
 
       <div className="flex items-center gap-1">
-        {/* Previous */}
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
@@ -361,7 +363,6 @@ export default function SearchPage() {
           Prev
         </button>
 
-        {/* Page numbers */}
         {Array.from({ length: totalPages }, (_, i) => i + 1)
           .filter(page =>
             page === 1 ||
@@ -398,7 +399,6 @@ export default function SearchPage() {
           )
         }
 
-        {/* Next */}
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
@@ -424,27 +424,11 @@ export default function SearchPage() {
     <div className="min-h-screen bg-[#F8FAF8] dark:bg-gray-950">
       <Navbar />
 
-      {/* Mobile search */}
-      <div className="md:hidden bg-white dark:bg-gray-900 border-b
-                      border-gray-100 dark:border-gray-800 px-4 py-3">
-        <input
-          type="search"
-          placeholder="Search hospitals, city or LGA..."
-          value={filters.query}
-          onChange={e => setFilters(f => ({ ...f, query: e.target.value }))}
-          onKeyDown={e => { if (e.key === 'Enter') runSearch(filters) }}
-          className="w-full border border-gray-200 dark:border-gray-700
-                     dark:bg-gray-800 dark:text-white rounded-xl px-4
-                     py-2.5 text-sm focus:outline-none focus:ring-2
-                     focus:ring-brand-700 placeholder:text-gray-300"
-        />
-      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <div className="flex flex-col md:flex-row gap-6">
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="flex gap-6">
-
-          {/* Sidebar */}
-          <aside className="w-64 shrink-0">
+          {/* Sidebar — desktop only */}
+          <aside className="hidden md:block w-64 shrink-0">
             <div className="bg-white dark:bg-gray-900 border
                             border-gray-200/60 dark:border-gray-800
                             rounded-2xl shadow-sm p-5 sticky top-20
@@ -483,12 +467,68 @@ export default function SearchPage() {
 
           {/* Main */}
           <main className="flex-1 min-w-0">
+
+            {/* Mobile search bar */}
+            <div className="md:hidden mb-4">
+              <input
+                type="search"
+                placeholder="Search hospitals, city or LGA..."
+                value={filters.query}
+                onChange={e =>
+                  setFilters(f => ({ ...f, query: e.target.value }))
+                }
+                onKeyDown={e => {
+                  if (e.key === 'Enter') runSearch(filters)
+                }}
+                className="w-full border border-gray-200 dark:border-gray-700
+                           dark:bg-gray-800 dark:text-white rounded-xl px-4
+                           py-2.5 text-sm focus:outline-none focus:ring-2
+                           focus:ring-brand-700 placeholder:text-gray-300
+                           mb-2"
+              />
+
+              {/* Mobile filter toggle */}
+              <button
+                onClick={() => setShowFilters(v => !v)}
+                className="flex items-center justify-center gap-2 w-full
+                           text-sm font-medium border border-gray-200
+                           dark:border-gray-700 px-4 py-2 rounded-xl
+                           bg-white dark:bg-gray-900 text-gray-700
+                           dark:text-gray-300 transition-colors
+                           hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0
+                           01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4
+                           2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013
+                           6V4z" />
+                </svg>
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
+              </button>
+
+              {showFilters && (
+                <div className="mt-3 bg-white dark:bg-gray-900 border
+                                border-gray-200 dark:border-gray-800
+                                rounded-2xl shadow-sm p-5 space-y-5">
+                  <FilterPanel
+                    filters={filters}
+                    onChange={handleFilterChange}
+                    onSearch={handleSearchButton}
+                  />
+                </div>
+              )}
+            </div>
+
             {ResultsHeader}
 
             {showMap ? (
-              <div className="flex gap-4"
+              <div className="flex flex-col sm:flex-row gap-4"
                    style={{ height: 'calc(100vh - 180px)' }}>
-                <div className="w-80 shrink-0 overflow-y-auto space-y-3 pr-1">
+                <div className="w-full sm:w-80 shrink-0 overflow-y-auto
+                                space-y-3 pr-1 max-h-64 sm:max-h-full">
                   {loading && Skeletons}
                   {!loading && searched && hospitals.length === 0 && EmptyState}
                   {!loading && hospitals.map(h => (
@@ -506,7 +546,7 @@ export default function SearchPage() {
                     </div>
                   ))}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 min-h-64">
                   <HospitalMap
                     hospitals={hospitals}
                     selectedId={selectedId}

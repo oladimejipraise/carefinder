@@ -151,7 +151,7 @@ export default function RatingWidget({
 
       <button
         onClick={handleSubmit}
-        disabled={loading}
+        disabled={loading || rating === 0}
         className="w-full bg-brand-700 text-white font-semibold py-3
                    rounded-xl hover:bg-brand-800 transition-colors
                    text-sm disabled:opacity-50 disabled:cursor-not-allowed"

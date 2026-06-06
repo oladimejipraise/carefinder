@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('CSV export', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/search')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     await page.waitForTimeout(3000)
     await expect(
       page.locator('a[href^="/hospitals/"]').first()

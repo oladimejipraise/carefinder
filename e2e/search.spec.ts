@@ -9,7 +9,7 @@ test.describe('Hospital search', () => {
 
   test('search page loads hospitals on initial load', async ({ page }) => {
     await page.goto('/search')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     await page.waitForTimeout(3000)
     const cards = page.locator('a[href^="/hospitals/"]')
     await expect(cards.first()).toBeVisible({ timeout: 15_000 })
@@ -18,7 +18,7 @@ test.describe('Hospital search', () => {
 
   test('searching by city filters results', async ({ page }) => {
     await page.goto('/search')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     await page.waitForTimeout(3000)
     await expect(
       page.locator('a[href^="/hospitals/"]').first()
@@ -34,20 +34,19 @@ test.describe('Hospital search', () => {
   })
 
   test('search updates URL with query params', async ({ page }) => {
-    await page.goto('/search')
-    await page.waitForLoadState('networkidle')
-    await page.waitForTimeout(3000)
-
-    await page.getByPlaceholder(/search by name/i).fill('Abuja')
-    await page.getByRole('button', { name: /search hospitals/i }).click()
-    await page.waitForTimeout(2000)
-
-    expect(page.url()).toContain('q=Abuja')
-  })
+  await page.goto('/search')
+  await page.waitForLoadState('domcontentloaded')
+  await page.waitForTimeout(2000)
+  const searchInput = page.getByPlaceholder(/search by name/i)
+  await searchInput.fill('Abuja')
+  await searchInput.press('Enter')
+  await page.waitForURL(/q=Abuja/, { timeout: 15000 })
+  expect(page.url()).toContain('q=Abuja')
+})
 
   test('empty search shows no results message', async ({ page }) => {
     await page.goto('/search')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
     await page.waitForTimeout(3000)
 
     await page.getByPlaceholder(/search by name/i)

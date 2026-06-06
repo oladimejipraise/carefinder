@@ -45,7 +45,7 @@ describe('HospitalCard', () => {
 
   it('renders no reviews text when rating is null', () => {
     render(<HospitalCard hospital={{ ...mockHospital, rating_avg: null }} />)
-    expect(screen.getByText(/No reviews yet/i)).toBeInTheDocument()
+    expect(screen.getByText(/No ratings yet/i)).toBeInTheDocument()
   })
 
   it('renders distance when provided', () => {

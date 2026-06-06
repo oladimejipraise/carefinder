@@ -8,7 +8,7 @@ test.describe('Admin authentication', () => {
 
   test('admin login page renders correctly', async ({ page }) => {
     await page.goto('/admin/login')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     await expect(
       page.getByRole('heading', { name: /admin sign in/i })
@@ -23,7 +23,7 @@ test.describe('Admin authentication', () => {
 
   test('login form shows error on invalid credentials', async ({ page }) => {
     await page.goto('/admin/login')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     await page.locator('input[type="email"]').fill('wrong@test.com')
     await page.locator('input[type="password"]').fill('wrongpassword123')
@@ -38,7 +38,7 @@ test.describe('Admin authentication', () => {
 
   test('login form requires email and password', async ({ page }) => {
     await page.goto('/admin/login')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     await page.getByRole('button', { name: /sign in/i }).click()
     await expect(page).toHaveURL(/\/admin\/login/)

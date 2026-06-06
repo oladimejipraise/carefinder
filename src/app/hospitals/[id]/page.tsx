@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { marked } from 'marked'
+import DOMPurify from 'isomorphic-dompurify'
 import { createClient } from '@/lib/supabase/server'
 import ReviewsSection from '@/components/hospital/ReviewsSection'
 import Logo from '@/components/ui/Logo'
@@ -62,6 +64,10 @@ export default async function HospitalDetailPage({ params }: Props) {
     ?? SPECIALTY_IMAGES[primarySpecialty]
     ?? DEFAULT_IMAGE
 
+  const descriptionHtml = hospital.description_md
+    ? DOMPurify.sanitize(marked(hospital.description_md) as string)
+    : null
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
 
@@ -87,7 +93,7 @@ export default async function HospitalDetailPage({ params }: Props) {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Left column */}
@@ -236,8 +242,8 @@ export default async function HospitalDetailPage({ params }: Props) {
               </div>
             </div>
 
-            {/* About — no duplicate text */}
-            {hospital.description_md && (
+            {/* About — sanitized HTML from Markdown */}
+            {descriptionHtml && (
               <div className="bg-white dark:bg-gray-800 border
                               border-gray-100 dark:border-gray-700
                               rounded-2xl p-6 shadow-sm">
@@ -245,20 +251,14 @@ export default async function HospitalDetailPage({ params }: Props) {
                                dark:text-white mb-4">
                   About
                 </h2>
-                <div className="text-gray-600 dark:text-gray-400
-                                leading-relaxed text-sm space-y-2">
-                  {hospital.description_md
-                    .replace(/^#+\s*/gm, '')
-                    .replace(/^About\\?n?/i, '')
-                    .replace(/\\n/g, '\n')
-                    .split('\n')
-                    .filter((line: string) =>
-                      line.trim() && !/^about$/i.test(line.trim())
-                    )
-                    .map((line: string, i: number) => (
-                      <p key={i}>{line}</p>
-                    ))}
-                </div>
+                <div
+                  className="prose prose-sm max-w-none
+                             text-gray-600 dark:text-gray-400
+                             prose-headings:text-brand-900
+                             dark:prose-headings:text-white
+                             prose-a:text-brand-700"
+                  dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                />
               </div>
             )}
 
@@ -352,9 +352,10 @@ export default async function HospitalDetailPage({ params }: Props) {
                 Call Hospital
               </a>
 
-              <a href={`https://www.google.com/maps/search/${encodeURIComponent(
-                        `${hospital.name} ${hospital.address} ${hospital.city}`
-                      )}`}
+              <a href={`https://www.google.com/maps/search/${
+                        encodeURIComponent(
+                          `${hospital.name} ${hospital.address} ${hospital.city}`
+                        )}`}
                  target="_blank"
                  rel="noopener noreferrer"
                  className="w-full flex items-center justify-center gap-2
@@ -375,13 +376,14 @@ export default async function HospitalDetailPage({ params }: Props) {
                 Get Directions
               </a>
 
-              <button className="w-full flex items-center justify-center
-                                 gap-2 border border-gray-200
-                                 dark:border-gray-600 text-gray-700
-                                 dark:text-gray-300 font-semibold py-3
-                                 rounded-xl hover:bg-gray-50
-                                 dark:hover:bg-gray-700 transition-colors
-                                 text-sm">
+              <button
+                className="w-full flex items-center justify-center gap-2
+                           border border-gray-200 dark:border-gray-600
+                           text-gray-700 dark:text-gray-300 font-semibold
+                           py-3 rounded-xl hover:bg-gray-50
+                           dark:hover:bg-gray-700 transition-colors
+                           text-sm"
+              >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round"
@@ -408,9 +410,7 @@ export default async function HospitalDetailPage({ params }: Props) {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-gray-500
-                                   dark:text-gray-400">
-                    Type
-                  </span>
+                                   dark:text-gray-400">Type</span>
                   <span className={`text-xs font-semibold px-2 py-0.5
                                     rounded-full ${
                     hospital.ownership === 'public'
@@ -422,9 +422,7 @@ export default async function HospitalDetailPage({ params }: Props) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-gray-500
-                                   dark:text-gray-400">
-                    City
-                  </span>
+                                   dark:text-gray-400">City</span>
                   <span className="text-xs font-semibold text-brand-900
                                    dark:text-white">
                     {hospital.city}
@@ -432,9 +430,7 @@ export default async function HospitalDetailPage({ params }: Props) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-gray-500
-                                   dark:text-gray-400">
-                    LGA
-                  </span>
+                                   dark:text-gray-400">LGA</span>
                   <span className="text-xs font-semibold text-brand-900
                                    dark:text-white">
                     {hospital.lga}
