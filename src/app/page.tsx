@@ -8,9 +8,10 @@ import { createClient } from '@/lib/supabase/client'
 
 export default function HomePage() {
   const router = useRouter()
-  const [query, setQuery]     = useState('')
-  const [user, setUser]       = useState<{ email: string } | null>(null)
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [query, setQuery]         = useState('')
+  const [user, setUser]           = useState<{ email: string } | null>(null)
+  const [isAdmin, setIsAdmin]     = useState(false)
+  const [mobileMenu, setMobileMenu] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -71,7 +72,7 @@ export default function HomePage() {
               Care<span style={{ color: '#99d6d5' }}>finder</span>
             </span>
 
-            {/* Nav links — centered, just About and Admin */}
+            {/* Nav links — centered, desktop only */}
             <nav className="hidden md:flex items-center gap-8 absolute
                             left-1/2 -translate-x-1/2">
               <button
@@ -91,8 +92,29 @@ export default function HomePage() {
             {/* Right actions */}
             <div className="flex items-center gap-3 shrink-0">
               <ThemeToggle />
+
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setMobileMenu(v => !v)}
+                className="md:hidden flex items-center justify-center
+                           w-8 h-8 text-white/70 hover:text-white
+                           transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  {mobileMenu ? (
+                    <path strokeLinecap="round" strokeLinejoin="round"
+                          strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round"
+                          strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+
+              {/* Desktop right actions */}
               {user ? (
-                <div className="hidden sm:flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-2">
                   {isAdmin && (
                     <Link href="/admin/dashboard"
                           className="text-sm font-medium border
@@ -111,7 +133,7 @@ export default function HomePage() {
                   </button>
                 </div>
               ) : (
-                <div className="hidden sm:flex items-center gap-3">
+                <div className="hidden md:flex items-center gap-3">
                   <Link href="/login"
                         className="text-sm text-white/70 hover:text-white
                                    font-medium transition-colors">
@@ -128,6 +150,67 @@ export default function HomePage() {
               )}
             </div>
           </div>
+
+          {/* Mobile menu dropdown */}
+          {mobileMenu && (
+            <div className="md:hidden border-t border-white/10
+                            px-4 py-3 space-y-1"
+                 style={{ background: 'rgba(0,0,0,0.3)' }}>
+              <button
+                onClick={() => { scrollToFeatures(); setMobileMenu(false) }}
+                className="block w-full text-left px-3 py-2.5 rounded-xl
+                           text-sm font-medium text-white/70 hover:text-white
+                           hover:bg-white/10 transition-colors"
+              >
+                About
+              </button>
+              <Link href="/admin/login"
+                    onClick={() => setMobileMenu(false)}
+                    className="block px-3 py-2.5 rounded-xl text-sm
+                               font-medium text-white/70 hover:text-white
+                               hover:bg-white/10 transition-colors">
+                Admin
+              </Link>
+              {!user ? (
+                <>
+                  <Link href="/login"
+                        onClick={() => setMobileMenu(false)}
+                        className="block px-3 py-2.5 rounded-xl text-sm
+                                   font-medium text-white/70 hover:text-white
+                                   hover:bg-white/10 transition-colors">
+                    Log in
+                  </Link>
+                  <Link href="/search"
+                        onClick={() => setMobileMenu(false)}
+                        className="block px-3 py-2.5 rounded-xl text-sm
+                                   font-bold text-white bg-white/10
+                                   hover:bg-white/20 transition-colors">
+                    Find Hospitals
+                  </Link>
+                </>
+              ) : (
+                <>
+                  {isAdmin && (
+                    <Link href="/admin/dashboard"
+                          onClick={() => setMobileMenu(false)}
+                          className="block px-3 py-2.5 rounded-xl text-sm
+                                     font-medium text-white/70 hover:text-white
+                                     hover:bg-white/10 transition-colors">
+                      Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => { handleSignOut(); setMobileMenu(false) }}
+                    className="block w-full text-left px-3 py-2.5 rounded-xl
+                               text-sm font-medium text-white/70 hover:text-white
+                               hover:bg-white/10 transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </header>
 
         {/* Hero content */}
