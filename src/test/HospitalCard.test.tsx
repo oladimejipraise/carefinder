@@ -17,7 +17,7 @@ const mockHospital: Hospital = {
   visiting_hours: null,
   rating_avg:     4.2,
   review_count:   12,
-  created_at:     '2025-01-01T00:00:00Z',
+  lat: 6.5, lng: 3.4, image_url: null, created_at:     '2025-01-01T00:00:00Z',
 }
 
 describe('HospitalCard', () => {
